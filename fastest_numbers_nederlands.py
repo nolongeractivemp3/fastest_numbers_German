@@ -1,74 +1,77 @@
 import math
 
-
 one_names = [
-    [["zero", 2], ["zeroeth", 2]],
-    [["one", 1], ["first", 1]],
-    [["two", 1], ["second", 2]],
-    [["three", 1], ["third", 1]],
-    [["four", 1], ["fourth", 1]],
-    [["five", 1], ["fifth", 1]],
-    [["six", 1], ["sixth", 1]],
-    [["seven", 2], ["seventh", 2]],
-    [["eight", 1], ["eighth", 1]],
-    [["nine", 1], ["ninth", 1]],
-    [["ten", 1], ["tenth", 1]],
-    [["eleven", 3], ["eleventh", 3]],
-    [["twelve", 1], ["twelfth", 1]],
-    [["thirteen", 2], ["thirteenth", 2]],
-    [["fourteen", 2], ["fourteenth", 2]],
-    [["fifteen", 2], ["fifteenth", 2]],
-    [["sixteen", 2], ["sixteenth", 2]],
-    [["seventeen", 3], ["seventeenth", 3]],
-    [["eighteen", 2], ["eighteenth", 2]],
-    [["nineteen", 2], ["nineteenth", 2]],
+    [["nul", 1], ["", 0]],
+    [["een", 1], ["eerst", 1]],
+    [["twee", 1], ["tweede", 2]],
+    [["drie", 1], ["derde", 2]],
+    [["vier", 1], ["vierde", 2]],
+    [["vijf", 1], ["vijfde", 2]],
+    [["zes", 1], ["zesde", 2]],
+    [["zeven", 2], ["zevende", 3]],
+    [["acht", 1], ["achtste", 2]],
+    [["negen", 2], ["negende", 3]],
+    [["tien", 1], ["tiende", 2]],
+    [["elf", 1], ["elfde", 2]],
+    [["twaalf", 1], ["twaalfde", 2]],
+    [["dertien", 2], ["dertiende", 3]],
+    [["veertien", 2], ["veertiende", 3]],
+    [["vijftien", 2], ["vijftiende", 3]],
+    [["zestien", 2], ["zestiende", 3]],
+    [["zeventien", 3], ["zeventiende", 4]],
+    [["achttien", 2], ["achttiende", 3]],
+    [["negentien", 3], ["negentiende", 4]],
 ]
 
 ten_names = [
     [[]],
     [[]],
-    [["twenty", 2], ["twentieth", 3]],
-    [["thirty", 2], ["thirtieth", 3]],
-    [["forty", 2], ["fortieth", 3]],
-    [["fifty", 2], ["fiftieth", 3]],
-    [["sixty", 2], ["sixtieth", 3]],
-    [["seventy", 3], ["seventieth", 4]],
-    [["eighty", 2], ["eightieth", 3]],
-    [["ninety", 2], ["ninetieth", 3]],
+    [["twintig", 2], ["twintigste", 3]],
+    [["dertig", 2], ["dertigste", 3]],
+    [["veertig", 2], ["veertigste", 3]],
+    [["vijftig", 2], ["vijftigste", 3]],
+    [["zestig", 2], ["zestigste", 3]],
+    [["zeventig", 3], ["zeventigste", 4]],
+    [["tachtig", 2], ["tachtigste", 3]],
+    [["negentig", 3], ["negentigste", 4]],
 ]
 
 large_names = [
-    ["hundred",2,100,2],
-    ["thousand",2,1000,3],
-    ["million",2,1000000,6],
-    ["billion",2,1000000000,9],
+    ["honderd",2,100,2],
+    ["duizend",2,1000,3],
+    ["miljoen",2,1000000,6],
+    ["biljoen",2,1000000000,9],
 ]
 
 superscripts = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹',
                 '¹⁰','¹¹','¹²','¹³','¹⁴','¹⁵','¹⁶','¹⁷','¹⁸','¹⁹',
                 '²⁰','²¹','²²','²³']
 
+number_names = []
 pemdas_count = 6
 
 
 def base_syllables(n):
     if n < 20:
         return one_names[n][0][1], one_names[n][0][0], one_names[n][1][1], one_names[n][1][0], 0, 1
-    if n < 100:
+    elif n < 100:
         n_mod = n % 10
         n_div = n // 10
         if n % 10 == 0: 
             return ten_names[n_div][0][1], ten_names[n_div][0][0], ten_names[n_div][1][1], ten_names[n_div][1][0], 1, 2
 
+        en_version = "en"
+        if n_mod == 2 or n_mod == 3:
+            en_version = "ën"
         return (
-                ten_names[n_div][0][1] + number_names[n_mod]["syllables"][1], 
-                ten_names[n_div][0][0] + "-" + number_names[n_mod]["names"][1],
-                ten_names[n_div][0][1] + number_names[n_mod]["syllables"][0], 
-                ten_names[n_div][0][0] + "-" + number_names[n_mod]["names"][0],
+                number_names[n_mod]["syllables"][1] + 1 + ten_names[n_div][0][1], 
+                number_names[n_mod]["names"][1] + en_version + ten_names[n_div][0][0],
+                number_names[n_mod]["syllables"][1] + 1 + ten_names[n_div][1][1], 
+                number_names[n_mod]["names"][1] + en_version + ten_names[n_div][1][0],
                 0,
                 2
             )
-        
+    
     large_index = 0
     while (large_names[large_index+1][2] <= n):
         large_index += 1
@@ -76,25 +79,32 @@ def base_syllables(n):
     n_mod = n % large_names[large_index][2]
     n_div = n // large_names[large_index][2]
 
+    prefix_name, prefix_syllables = number_names[n_div]["names"][1], number_names[n_div]["syllables"][1]
+    if n_div == 1 and large_index < 2:
+        prefix_name, prefix_syllables = "", 0
+    elif n_div > 99 or large_index > 1:
+        prefix_name += " "
+
     if n_mod == 0:
         return (
-            number_names[n_div]["syllables"][1] + large_names[large_index][1],
-            number_names[n_div]["names"][1] + " " + large_names[large_index][0],
-            number_names[n_div]["syllables"][1] + large_names[large_index][1],
-            number_names[n_div]["names"][1] + " " + large_names[large_index][0] + "th",
+            prefix_syllables + large_names[large_index][1],
+            prefix_name + large_names[large_index][0],
+            prefix_syllables + large_names[large_index][1] + 1,
+            prefix_name + large_names[large_index][0] + "sten",
             large_names[large_index][3] + number_names[n_div]["zeroes"],
             large_names[large_index][3] + number_names[n_div]["digits"]
         )
     
-    connect_word, connect_syllables = " ", 0
-    # if n_mod < 100:
-    #     connect_word, connect_syllables = " and ", 1
+    
+    connect_word, connect_syllables = "", 0
+    if large_index > 0:
+        connect_word = " "
 
     return (
-        number_names[n_div]["syllables"][1] + large_names[large_index][1] + connect_syllables + number_names[n_mod]["syllables"][1],
-        number_names[n_div]["names"][1] + " " + large_names[large_index][0] + connect_word + number_names[n_mod]["names"][1],
-        number_names[n_div]["syllables"][1] + large_names[large_index][1] + connect_syllables + number_names[n_mod]["syllables"][0],
-        number_names[n_div]["names"][1] + " " + large_names[large_index][0] + connect_word + number_names[n_mod]["names"][0],
+        prefix_syllables + large_names[large_index][1] + connect_syllables + number_names[n_mod]["syllables"][1],
+        prefix_name + large_names[large_index][0] + connect_word + number_names[n_mod]["names"][1],
+        prefix_syllables + large_names[large_index][1] + connect_syllables + number_names[n_mod]["syllables"][0],
+        prefix_name + large_names[large_index][0] + connect_word + number_names[n_mod]["names"][0],
         number_names[n_mod]["zeroes"],
         large_names[large_index][3] + number_names[n_div]["digits"]
     )
@@ -102,7 +112,7 @@ def base_syllables(n):
 
 
 
-def number_names_generator(leave_point,max_number,silly=True):
+def number_names_generator(leave_point,max_number):
     max_syllables = 0
 
     for n in range(0,max_number + 1):
@@ -128,28 +138,26 @@ def number_names_generator(leave_point,max_number,silly=True):
         max_syllables = max(max_syllables, n_syllables)
 
 
-    number_names[2]["syllables"][0] = 1
-    number_names[2]["names"][0] = "halve"
+    number_names[2]["syllables"][0] = 2
+    number_names[2]["names"][0] = "helften"
 
     syllable_key = [[]]
     for u in range(pemdas_count):
         syllable_key[0].append([])
 
-    # pemdas indices: 0 ordinal, 1 original, 2 exponent, 3 multiplication, 4 division, 5 addition and subtraction
+    # pemdas: ordinal, original, unary, multiplication, division, addition and subtraction
     unary = [
-        {"id": "²", "syllables": 1, "text": " squared", "value": 2, "pemdas_input": 2,"pemdas_result": 2},
-        {"id": "³", "syllables": 1, "text": " cubed", "value": 3, "pemdas_input": 2,"pemdas_result": 2},
+        {"id": "²", "syllables": 2, "text": " kwadraat", "value": 2, "pemdas_input": 2,"pemdas_result": 2},
     ]
     
     binary = [
-        { "id": "+", "syllables": 1, "text": " plus ", "suffix": "", "pemdas_left": 5,"pemdas_right": 5,"pemdas_result": 5},
-        { "id": "*", "syllables": 1, "text": " times ", "suffix": "", "pemdas_left": 3,"pemdas_right": 4,"pemdas_result": 4},
-        { "id": "*", "syllables": 1, "text": " times ", "suffix": "", "pemdas_left": 3,"pemdas_right": 3,"pemdas_result": 3},
-        { "id": "-", "syllables": 1, "text": " less ", "suffix": "", "pemdas_left": 5,"pemdas_right": 4,"pemdas_result": 5},
-        { "id": "/", "syllables": 2, "text": " over ", "suffix": "", "pemdas_left": 3,"pemdas_right": 2,"pemdas_result": 4},
-        { "id": "fraction", "syllables": 0, "text": " ", "suffix": "s", "pemdas_left": 2,"pemdas_right": 0,"pemdas_result": 2},
-        { "id": "group", "syllables": 0, "text": " ", "suffix": "s", "pemdas_left": 3,"pemdas_right": 1,"pemdas_result": 3},
-        { "id": "^", "syllables": 2, "text": " to the ", "suffix": "","pemdas_left": 2, "pemdas_right": 0,"pemdas_result": 2},
+        { "id": "-", "syllables": 1, "text": " min ", "pemdas_left": 5,"pemdas_right": 4,"pemdas_result": 5},
+        { "id": "+", "syllables": 1, "text": " plus ", "pemdas_left": 5,"pemdas_right": 5,"pemdas_result": 5},
+        { "id": "*", "syllables": 1, "text": " keer ", "pemdas_left": 3,"pemdas_right": 4,"pemdas_result": 4},
+        { "id": "*", "syllables": 1, "text": " keer ", "pemdas_left": 3,"pemdas_right": 3,"pemdas_result": 3},
+        { "id": "/", "syllables": 2, "text": " over ", "pemdas_left": 3,"pemdas_right": 2,"pemdas_result": 4},
+        { "id": "fraction", "syllables": 0, "text": " ", "pemdas_left": 2,"pemdas_right": 0,"pemdas_result": 2},
+        { "id": "^", "syllables": 2, "text": " tot de ", "pemdas_left": 2, "pemdas_right": 0,"pemdas_result": 2},
     ]
 
     min_missing = 1
@@ -160,7 +168,7 @@ def number_names_generator(leave_point,max_number,silly=True):
         for u in range(pemdas_count):
             syllable_key[s].append([])
             
-        for n in range(min_missing,max_number+1):
+        for n in range(1,max_number+1):
             for u in range(pemdas_count):
                 if number_names[n]["syllables"][u] < s:
                     break
@@ -168,7 +176,6 @@ def number_names_generator(leave_point,max_number,silly=True):
                     syllable_key[s][u].append(number_names[n]["value"])
                 elif u > 0:
                     break
-
 
         for op in binary:
             #print(op)
@@ -193,11 +200,8 @@ def number_names_generator(leave_point,max_number,silly=True):
                             and right_value != 2
                             and number_names[left_value]["zeroes"] >= number_names[right_value]["digits"]
                             and (number_names[left_value]["nonzero"] > 1 or number_names[right_value]["nonzero"] > 1)
-                            and number_names[left_value]["names"][1] == number_names[left_value]["names"][2]):
+                            and number_names[left_value]["names"][0] == number_names[left_value]["names"][1]):
                             continue
-                        elif op["id"] == "group" and right_value%10==6:
-                            continue
-
 
                         op_output, valid_output = get_output(op, left_value, right_value)
                         if not valid_output:
@@ -205,35 +209,32 @@ def number_names_generator(leave_point,max_number,silly=True):
                         
                         new_name = (number_names[left_value]["names"][op["pemdas_left"]] 
                                     + op["text"] 
-                                    + number_names[right_value]["names"][op["pemdas_right"]]
-                                    + op["suffix"])
+                                    + number_names[right_value]["names"][op["pemdas_right"]])
                         
                         new_equation = number_names[left_value]["equations"][op["pemdas_left"]] 
                         if op["id"] == "^" and new_equation == number_names[left_value]["equations"][1]:
                             new_equation = new_equation + " " + superscripts[right_value]
                         elif op["id"] == "^":
                             new_equation = "(" + new_equation + ") " + superscripts[right_value]
+
                         else:
                             if op["id"] == "fraction":
-                                new_equation += " / "
+                                new_equation += "/"
                             else:
                                 new_equation += " " + op["id"] + " "
                             new_equation += number_names[right_value]["equations"][op["pemdas_right"]]
-                        
+
                         for u in range(op["pemdas_result"],pemdas_count):
 
-                            if number_names[op_output]["syllables"][u] > s:
-                                number_names[op_output]["names"][u] = new_name
-                                number_names[op_output]["equations"][u] = new_equation
-                                number_names[op_output]["syllables"][u] = s
-                                syllable_key[s][u].append(op_output)
-
-                            # To only replace current number name with sillier version
-                            # of the same syllable length if silly=True
-                            if silly and number_names[op_output]["syllables"][u] == s:
+                            if number_names[op_output]["syllables"][u] >= s:
                                 number_names[op_output]["names"][u] = new_name
                                 number_names[op_output]["equations"][u] = new_equation
 
+                                if number_names[op_output]["syllables"][u] > s:
+                                    number_names[op_output]["syllables"][u] = s
+                                    syllable_key[s][u].append(op_output)
+
+        
         for op in unary:
             #print(op)
             if s <= op["syllables"]:
@@ -252,20 +253,21 @@ def number_names_generator(leave_point,max_number,silly=True):
 
                 new_name = number_names[input_value]["names"][op["pemdas_input"]] + op["text"]
                 new_equation = number_names[input_value]["equations"][op["pemdas_input"]]
+                if new_equation == number_names[input_value]["equations"][1]:
+                    new_equation = new_equation + " " + op["id"]
+                else:
+                    new_equation = "(" + new_equation + ") " + op["id"]
                 for u in range(op["pemdas_result"],pemdas_count):
-                    if number_names[op_output]["syllables"][u] > s:
+                    if number_names[op_output]["syllables"][u] >= s:
                         number_names[op_output]["names"][u] = new_name
                         number_names[op_output]["equations"][u] = new_equation
-                        number_names[op_output]["syllables"][u] = s
-                        syllable_key[s][u].append(op_output)
 
-                    # To only replace current number name with sillier version
-                    # of the same syllable length if silly=True
-                    if silly and number_names[op_output]["syllables"][u] == s:
-                        number_names[op_output]["names"][u] = new_name
-                        number_names[op_output]["equations"][u] = new_equation
-                
+                        if number_names[op_output]["syllables"][u] > s:
+                            number_names[op_output]["syllables"][u] = s
+                            syllable_key[s][u].append(op_output)
 
+
+            
         for i in range(pemdas_count):
             syllable_key[s][i].sort()
         while number_names[min_missing]["syllables"][-1] <= s:
@@ -280,41 +282,37 @@ def number_names_generator(leave_point,max_number,silly=True):
 def get_first_extremes(op,min_missing,max_number):
     if op["id"] == "²":
         return min_missing**(1/2), max_number**(1/2)
-    elif op["id"] == "³":
-        return min_missing**(1/3), max_number**(1/3)
     elif op["id"] == "+":
         return 6, max_number-1
-    elif op["id"] == "*" or op["id"] == "group":
+    elif op["id"] == "*":
         return 2, max_number**0.5
     elif op["id"] == "-":
         return min_missing+1, max_number
     elif op["id"] == "/" or op["id"] == "fraction":
         return min_missing*2, max_number
     elif op["id"] == "^":
-        return 2, max_number**0.2
+        return 2, max_number**0.34
     
 def get_second_extremes(op,min_missing,max_number,left_value):
     if op["id"] == "+":
         return 1, min(left_value,max_number - left_value)
-    elif op["id"] == "*" or op["id"] == "group":
+    elif op["id"] == "*":
         return max(left_value,min_missing/left_value), max_number/left_value
     elif op["id"] == "-":
         return 1, left_value-min_missing
     elif op["id"] == "/" or op["id"] == "fraction":
         return 2, left_value/2
     elif op["id"] == "^":
-        return 5, math.log(max_number)/math.log(left_value)
+        return 3, math.log(max_number)/math.log(left_value)
     
 def get_output(op,left_value,right_value=0):
     if op["id"] == "²":
         return left_value**2, True
-    if op["id"] == "³":
-        return left_value**3, True
     elif op["id"] == "^":
         return left_value**right_value, True
     elif op["id"] == "+":
         return left_value + right_value, True
-    elif op["id"] == "*" or op["id"] == "group":
+    elif op["id"] == "*":
         return left_value * right_value, True
     elif op["id"] == "-":
         return left_value - right_value, True
@@ -323,30 +321,12 @@ def get_output(op,left_value,right_value=0):
             return left_value // right_value, True
         return 0, False
 
-def numbers_out(number_names, file_name, *args): # modified to be able to write silly+nonsilly to the same csv
+def numbers_out(number_names, file_name):
     with open(file_name,"w",encoding="utf-8") as f:
-        for index in range(len(number_names)):
-            l = number_names[index]
-            line = str(l["value"]) + "," + l["names"][-1] + "," + l["equations"][-1] + ","
-            for ar in args: # there should only be one extra argument (the silly version) for now, just failsafe-ing this a bit
-                if l["value"] != ar[index]["value"]: # if values do not match (this should not happen!)
-                    print("Values do not match at index " + str(index) + ": "
-                                     + str(l["value"]) + " vs " + str(ar[index]["value"]))
-                    line += "Values do not match: " + str(ar[index]["value"]) + ","
-                    break
-                if l["syllables"][-1] != ar[index]["syllables"][-1]: # if syllable lengths do not match (this should not happen!)
-                    print("Syllables do not match at " + str(l["value"]) + ": "
-                                     + l["names"][-1] + " vs " + ar[index]["names"][-1])
-                    line += "Syllables do not match: "
-                line += ar[index]["names"][-1] + "," + ar[index]["equations"][-1] + ","
-            line += str(l["syllables"][-1])  +"\n"
-            f.write(line)
+        for l in number_names:
+           f.write(str(l["value"]) + "," + l["names"][-1] + "," + l["equations"][-1] + "," + str(l["syllables"][-1]) + "\n")
 
 
 
-number_names = []
-fast_numbers = number_names_generator(10000,100000)
-number_names = []
-fast_numbers_nonsilly = number_names_generator(10000,100000,False)
-numbers_out(fast_numbers_nonsilly, 'fastest_numbers.csv', fast_numbers)
-
+eff_names = number_names_generator(10000,100000)
+numbers_out(eff_names, 'fastest_numbers_nl.csv')

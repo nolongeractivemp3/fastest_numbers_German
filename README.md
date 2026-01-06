@@ -1,5 +1,7 @@
 ## What's the fastest way to say each number? 
 
+Please note: pull requests will only be approved for the 'collaborative' titled file or added files in other languages. The existing English version will stay static to match the logic used in the video and on the website.
+
 'Twenty-seven' is 4 syllables, but 'three cubed' is only 2! This program calculates the least amount of syllables needed to say each number, as discussed in my video: https://youtu.be/Ff8qIBUu4wM
 
 The process is as follows:
