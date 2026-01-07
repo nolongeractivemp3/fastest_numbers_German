@@ -48,7 +48,6 @@ superscripts = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹',
                 '¹⁰','¹¹','¹²','¹³','¹⁴','¹⁵','¹⁶','¹⁷','¹⁸','¹⁹',
                 '²⁰','²¹','²²','²³']
 
-number_names = []
 pemdas_count = 6
 
 
@@ -103,7 +102,7 @@ def base_syllables(n):
 
 
 
-def number_names_generator(leave_point,max_number):
+def number_names_generator(leave_point,max_number,silly=True):
     max_syllables = 0
 
     for n in range(0,max_number + 1):
@@ -223,13 +222,17 @@ def number_names_generator(leave_point,max_number):
                         
                         for u in range(op["pemdas_result"],pemdas_count):
 
-                            if number_names[op_output]["syllables"][u] >= s:
+                            if number_names[op_output]["syllables"][u] > s:
                                 number_names[op_output]["names"][u] = new_name
                                 number_names[op_output]["equations"][u] = new_equation
+                                number_names[op_output]["syllables"][u] = s
+                                syllable_key[s][u].append(op_output)
 
-                                if number_names[op_output]["syllables"][u] > s:
-                                    number_names[op_output]["syllables"][u] = s
-                                    syllable_key[s][u].append(op_output)
+                            # To only replace current number name with sillier version
+                            # of the same syllable length if silly=True
+                            if silly and number_names[op_output]["syllables"][u] == s:
+                                number_names[op_output]["names"][u] = new_name
+                                number_names[op_output]["equations"][u] = new_equation
 
         for op in unary:
             #print(op)
@@ -249,19 +252,18 @@ def number_names_generator(leave_point,max_number):
 
                 new_name = number_names[input_value]["names"][op["pemdas_input"]] + op["text"]
                 new_equation = number_names[input_value]["equations"][op["pemdas_input"]]
-                if new_equation == number_names[input_value]["equations"][1]:
-                    new_equation = new_equation + " " + op["id"]
-                else:
-                    new_equation = "(" + new_equation + ") " + op["id"]
-                    
                 for u in range(op["pemdas_result"],pemdas_count):
-                    if number_names[op_output]["syllables"][u] >= s:
+                    if number_names[op_output]["syllables"][u] > s:
                         number_names[op_output]["names"][u] = new_name
                         number_names[op_output]["equations"][u] = new_equation
+                        number_names[op_output]["syllables"][u] = s
+                        syllable_key[s][u].append(op_output)
 
-                        if number_names[op_output]["syllables"][u] > s:
-                            number_names[op_output]["syllables"][u] = s
-                            syllable_key[s][u].append(op_output)
+                    # To only replace current number name with sillier version
+                    # of the same syllable length if silly=True
+                    if silly and number_names[op_output]["syllables"][u] == s:
+                        number_names[op_output]["names"][u] = new_name
+                        number_names[op_output]["equations"][u] = new_equation
                 
 
         for i in range(pemdas_count):
@@ -321,15 +323,30 @@ def get_output(op,left_value,right_value=0):
             return left_value // right_value, True
         return 0, False
 
-def numbers_out(number_names, file_name):
+def numbers_out(number_names, file_name, *args): # modified to be able to write silly+nonsilly to the same csv
     with open(file_name,"w",encoding="utf-8") as f:
-        for l in number_names:
-           f.write(str(l["value"]) + "," + l["names"][-1] + "," + l["equations"][-1] + "," + str(l["syllables"][-1])  +"\n")
+        for index in range(len(number_names)):
+            l = number_names[index]
+            line = str(l["value"]) + "," + l["names"][-1] + "," + l["equations"][-1] + ","
+            for ar in args: # there should only be one extra argument (the silly version) for now, just failsafe-ing this a bit
+                if l["value"] != ar[index]["value"]: # if values do not match (this should not happen!)
+                    print("Values do not match at index " + str(index) + ": "
+                                     + str(l["value"]) + " vs " + str(ar[index]["value"]))
+                    line += "Values do not match: " + str(ar[index]["value"]) + ","
+                    break
+                if l["syllables"][-1] != ar[index]["syllables"][-1]: # if syllable lengths do not match (this should not happen!)
+                    print("Syllables do not match at " + str(l["value"]) + ": "
+                                     + l["names"][-1] + " vs " + ar[index]["names"][-1])
+                    line += "Syllables do not match: "
+                line += ar[index]["names"][-1] + "," + ar[index]["equations"][-1] + ","
+            line += str(l["syllables"][-1])  +"\n"
+            f.write(line)
 
 
 
-
+number_names = []
 fast_numbers = number_names_generator(10000,100000)
-numbers_out(fast_numbers, 'fastest_numbers.csv')
-
+number_names = []
+fast_numbers_nonsilly = number_names_generator(10000,100000,False)
+numbers_out(fast_numbers_nonsilly, 'fastest_numbers.csv', fast_numbers)
 
